@@ -1,6 +1,6 @@
 # Servicio de Precios de Comercio Electrónico
 
-Este README proporciona información sobre un servicio de precios de comercio electrónico desarrollado utilizando Spring Boot. El servicio ofrece un punto final REST para consultar información de precios basada en parámetros de entrada.
+Este README proporciona información sobre un servicio de precios de comercio electrónico desarrollado utilizando Spring Boot. El servicio ofrece un end-point REST para consultar información de precios basada en parámetros de entrada.
 
 ## Tabla de Contenidos
 
