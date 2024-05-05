@@ -1,6 +1,12 @@
 # Servicio de Precios de Comercio Electrónico
 
-Este README proporciona información sobre un servicio de precios de comercio electrónico desarrollado utilizando Spring Boot. El servicio ofrece un punto final REST para consultar información de precios basada en parámetros de entrada.
+![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
+![SonarLint](https://img.shields.io/badge/SonarLint-CB2029?style=for-the-badge&logo=SONARLINT&logoColor=white)
+
+
+Este README proporciona información sobre un servicio de precios de comercio electrónico desarrollado utilizando Spring Boot. El servicio ofrece un end-point REST para consultar información de precios basada en parámetros de entrada.
 
 ## Tabla de Contenidos
 
