@@ -50,7 +50,8 @@ El end-point devuelve los siguientes datos de salida:
 - `productId`: Identificador del producto.
 - `brandId`: Identificador de la cadena.
 - `applicableTariff`: Tarifa a aplicar.
-- `applicationDates`: Fechas de aplicación.
+- `startDate`: Fecha de inicio.
+- `endDate`: Fecha de finalización.
 - `finalPrice`: Precio final a aplicar.
 
 ## Pruebas
