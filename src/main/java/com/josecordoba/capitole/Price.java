@@ -1,9 +1,6 @@
 package com.josecordoba.capitole;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -27,7 +24,9 @@ public class Price {
     private LocalDateTime endDate;
     private Long priceList;
     private Integer priority;
+    @Column(name = "PRICE")
     private BigDecimal priceValue;
+    @Column(name = "CURR")
     private String currency;
 
 }
