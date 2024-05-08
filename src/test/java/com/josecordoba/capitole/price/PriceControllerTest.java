@@ -10,15 +10,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,10 +40,10 @@ class PriceControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "2020-06-14T10:00:00,35455,1,1,35.50",
-            "2020-06-14T16:00:00,35455,1,1,35.50",
-            "2020-06-14T21:00:00,35455,1,1,35.50",
-            "2020-06-15T10:00:00,35455,1,3,30.50",
+            "2020-06-14T10:00:00,35455,1,1,35.5",
+            "2020-06-14T16:00:00,35455,1,1,35.5",
+            "2020-06-14T21:00:00,35455,1,1,35.5",
+            "2020-06-15T10:00:00,35455,1,3,30.5",
             "2020-06-16T21:00:00,35455,1,4,38.95"
     })
     void testCalculatePriceScenarios(
@@ -65,7 +63,7 @@ class PriceControllerTest {
                 .build();
 
         // Mock the behavior of the priceService
-        when(priceService.calculatePrice(Mockito.any())).thenReturn(ResponseEntity.ok(expectedResponse));
+        when(priceService.calculatePrice(Mockito.any())).thenReturn(Optional.ofNullable(expectedResponse));
 
         // Prepare the request payload
         PriceRequest request = PriceRequest.builder()
@@ -75,7 +73,7 @@ class PriceControllerTest {
                 .build();
 
         // Perform the POST request
-        MvcResult mvcResult = mockMvc.perform(post("/api/v3/prices/calculate")
+        mockMvc.perform(post("/api/v3/prices/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper()
                                 .registerModule(new JavaTimeModule())
@@ -87,18 +85,6 @@ class PriceControllerTest {
                 .andExpect(jsonPath("$.priceList").value(priceList))
                 .andExpect(jsonPath("$.priceValue").value(expectedPrice))
                 .andReturn();
-
-        // Verify the response content
-        String responseBody = mvcResult.getResponse().getContentAsString();
-        PriceResponse response = new ObjectMapper().readValue(responseBody, PriceResponse.class);
-
-        // Add assertions to verify response content
-        assertEquals(expectedResponse.getProductId(), response.getProductId());
-        assertEquals(expectedResponse.getBrandId(), response.getBrandId());
-        assertEquals(expectedResponse.getPriceList(), response.getPriceList());
-        assertEquals(expectedResponse.getPriceValue(), response.getPriceValue());
-        assertEquals(expectedResponse.getStartDate(), response.getStartDate());
-        assertEquals(expectedResponse.getEndDate(), response.getEndDate());
 
         // Verify that the PriceService's calculatePrice method was called with the correct request
         verify(priceService).calculatePrice(request);

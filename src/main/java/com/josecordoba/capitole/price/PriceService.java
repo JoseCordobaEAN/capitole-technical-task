@@ -1,7 +1,7 @@
 package com.josecordoba.capitole.price;
 
-import org.springframework.http.ResponseEntity;
+import java.util.Optional;
 
 public interface PriceService {
-    ResponseEntity<PriceResponse> calculatePrice(PriceRequest request);
+    Optional<PriceResponse> calculatePrice(PriceRequest request);
 }
