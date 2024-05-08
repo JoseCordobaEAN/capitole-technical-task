@@ -2,77 +2,54 @@ package com.josecordoba.capitole.price;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 class PriceControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
-    PriceService priceService;
-
-    @InjectMocks
-    PriceController priceController;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(priceController).build();
-    }
+    @Autowired
+    private PriceRepository priceRepository;
 
     @ParameterizedTest
     @CsvSource({
-            "2020-06-14T10:00:00,35455,1,1,35.5",
-            "2020-06-14T16:00:00,35455,1,1,35.5",
-            "2020-06-14T21:00:00,35455,1,1,35.5",
-            "2020-06-15T10:00:00,35455,1,3,30.5",
-            "2020-06-16T21:00:00,35455,1,4,38.95"
+            "2020-06-14T10:00:00,35455,1,1,35.5,2020-06-14T00:00:00,2020-12-31T23:59:59",
+            "2020-06-14T16:00:00,35455,1,2,25.45,2020-06-14T15:00:00,2020-06-14T18:30:00",
+            "2020-06-14T21:00:00,35455,1,1,35.5,2020-06-14T00:00:00,2020-12-31T23:59:59",
+            "2020-06-15T10:00:00,35455,1,3,30.5,2020-06-15T00:00:00,2020-06-15T11:00:00",
+            "2020-06-16T21:00:00,35455,1,4,38.95,2020-06-15T16:00:00,2020-12-31T23:59:59"
     })
-    void testCalculatePriceScenarios(
+    void testCalculatePrice(
             String applicationDate,
             Long productId,
             Long brandId,
             Long priceList,
-            String expectedPrice
+            String expectedPrice,
+            String expectedStartDate,
+            String expectedEndDate
     ) throws Exception {
-        PriceResponse expectedResponse = PriceResponse.builder()
-                .productId(productId)
-                .brandId(brandId)
-                .priceList(priceList)
-                .startDate(LocalDateTime.parse("2020-06-14T00:00:00"))
-                .endDate(LocalDateTime.parse("2020-12-31T23:59:59"))
-                .priceValue(new BigDecimal(expectedPrice))
-                .build();
-
-        // Mock the behavior of the priceService
-        when(priceService.calculatePrice(Mockito.any())).thenReturn(Optional.ofNullable(expectedResponse));
-
-        // Prepare the request payload
         PriceRequest request = PriceRequest.builder()
                 .applicationDate(LocalDateTime.parse(applicationDate))
                 .productId(productId)
                 .brandId(brandId)
                 .build();
 
-        // Perform the POST request
         mockMvc.perform(post("/api/v3/prices/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper()
@@ -83,10 +60,9 @@ class PriceControllerTest {
                 .andExpect(jsonPath("$.productId").value(productId))
                 .andExpect(jsonPath("$.brandId").value(brandId))
                 .andExpect(jsonPath("$.priceList").value(priceList))
-                .andExpect(jsonPath("$.priceValue").value(expectedPrice))
+                .andExpect(jsonPath("$.startDate").value(expectedStartDate))
+                .andExpect(jsonPath("$.endDate").value(expectedEndDate))
+                .andExpect(jsonPath("$.priceValue").value(expectedPrice)) // Use expectedPrice from the CSV source
                 .andReturn();
-
-        // Verify that the PriceService's calculatePrice method was called with the correct request
-        verify(priceService).calculatePrice(request);
     }
 }
